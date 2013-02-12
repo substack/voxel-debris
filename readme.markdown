@@ -63,6 +63,9 @@ When `opts.expire` is a number, its value will be used for both start and end.
 
 `opts.power` influcences the velocity of the debris. Default value: 1.
 
+`opts.radius` controls the radius of the explosion with a slight randomization
+of the edges. Default value: 1.
+
 ## explode(pos)
 
 Explode the block at the THREE.Vector3 position `pos` if the data at `pos` is

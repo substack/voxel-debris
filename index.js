@@ -17,7 +17,8 @@ module.exports = function (game, opts) {
     }
     if (!opts.expire.start) opts.expire.start = 15 * 1000;
     if (!opts.expire.end) opts.expire.end = 30 * 1000;
-    if (!opts.power) opts.power = 1
+    if (!opts.power) opts.power = 1;
+    if (!opts.radius) opts.radius = 1;
     
     game.on('collision', function (item) {
         if (!item._debris) return;
@@ -29,7 +30,7 @@ module.exports = function (game, opts) {
     });
     
     var em = new EventEmitter;
-    return funstance(em, function (pos) {
+    var explodeOneBlock = funstance(em, function (pos) {
         var value = game.getBlock(pos);
         if (value === 0) return;
         game.setBlock(pos, 0);
@@ -52,6 +53,29 @@ module.exports = function (game, opts) {
             }, time, item);
         }
     });
+
+    function explodeWithRadius(pos) {
+        var r = opts.radius;
+        var r2 = r*r;
+
+        for (var x=-r; x<=r; x++) {
+            for (var y=-r; y<=r; y++) {
+                for (var z=-r; z<=r; z++) {
+                    var v = x*x+y*y+z*z;
+                    var variation = Math.random()*0.5+0.5
+                    if (v <= (r2*variation)) {
+                        explodeOneBlock({x:pos.x+x*game.cubeSize, y:pos.y+y*game.cubeSize, z:pos.z+z*game.cubeSize})
+                    }
+                }
+            }
+        }
+    }
+
+    if (opts.radius <= 1) {
+        return explodeOneBlock;
+    } else {
+        return explodeWithRadius;
+    }
 }
 
 function createDebris (game, pos, value) {
